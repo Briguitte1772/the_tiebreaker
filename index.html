@@ -1,42 +1,154 @@
 <Html>
-You are "The Tiebreaker", an expert rational decision-making assistant.
-Your goal is to help users overcome decision paralysis by organizing their options objectively.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Tiebreaker</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-6 md:p-12 font-sans">
 
-When given a dilemma, analyze the options and return a single valid JSON object with the following schema:
+  <!-- Header -->
+  <header class="max-w-2xl w-full text-center mb-8">
+    <div class="inline-block bg-indigo-950/70 border border-indigo-500/30 text-indigo-400 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
+      ⚖️ The Tiebreaker
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black tracking-tight text-white mb-2">
+      Clarity when you're stuck in the middle.
+    </h1>
+    <p class="text-slate-400 text-sm md:text-base">
+      Enter any dilemma to see pros, cons, and a rational recommendation.
+    </p>
+  </header>
 
-{
-  "summary": "Brief 1-2 sentence framing of the core dilemma",
-  "pros_and_cons": [
-    {
-      "option": "Option A",
-      "pros": [{"text": "Pro description", "weight": 4}],
-      "cons": [{"text": "Con description", "weight": -3}]
-    }
-  ],
-  "comparison_matrix": {
-    "criteria": ["Cost/Effort", "Risk", "Upside", "Peace of Mind"],
-    "options": [
-      {
-        "name": "Option A",
-        "scores": [4, 2, 5, 3], // 1-5 scale
-        "notes": "Brief comment on tradeoffs"
+  <!-- Input Form -->
+  <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl mb-8">
+    <textarea 
+      id="decisionInput"
+      placeholder="e.g. Should I accept the new job offer or stay at my current company?" 
+      class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-28 text-sm md:text-base mb-3"
+    ></textarea>
+    <div class="flex justify-between items-center">
+      <span class="text-xs text-slate-500">Name both choices for best results.</span>
+      <button 
+        id="submitBtn"
+        onclick="generateAnalysis()"
+        class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-2.5 rounded-xl transition-all shadow-md text-sm cursor-pointer"
+      >
+        ✨ Break the Tie
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Container (Hidden until user clicks button) -->
+  <div id="resultsContainer" class="max-w-2xl w-full hidden space-y-6">
+    
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-slate-800 gap-2 pb-2">
+      <button onclick="switchTab('pros_cons')" id="tabBtn-pros_cons" class="px-4 py-2 rounded-lg text-xs md:text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+        Pros & Cons
+      </button>
+      <button onclick="switchTab('verdict')" id="tabBtn-verdict" class="px-4 py-2 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-slate-200">
+        The Verdict
+      </button>
+    </div>
+
+    <!-- Tab 1: Pros & Cons -->
+    <div id="tab-pros_cons" class="grid md:grid-cols-2 gap-4">
+      <!-- Option A -->
+      <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+        <h3 class="font-bold text-slate-200 text-sm mb-3">Option A: The New Path / Change</h3>
+        <p class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Pros</p>
+        <ul class="text-xs text-slate-300 space-y-1 mb-3">
+          <li class="flex justify-between"><span>• Higher long-term upside</span><span class="text-emerald-400 font-mono">+5</span></li>
+          <li class="flex justify-between"><span>• Accelerates personal growth</span><span class="text-emerald-400 font-mono">+4</span></li>
+          <li class="flex justify-between"><span>• Eliminates "what if" regret</span><span class="text-emerald-400 font-mono">+4</span></li>
+        </ul>
+        <p class="text-[11px] font-bold text-rose-400 uppercase tracking-wider mb-1 border-t border-slate-800/80 pt-2">Cons</p>
+        <ul class="text-xs text-slate-300 space-y-1">
+          <li class="flex justify-between"><span>• High initial uncertainty</span><span class="text-rose-400 font-mono">-4</span></li>
+          <li class="flex justify-between"><span>• Steeper learning curve</span><span class="text-rose-400 font-mono">-3</span></li>
+        </ul>
+      </div>
+
+      <!-- Option B -->
+      <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+        <h3 class="font-bold text-slate-200 text-sm mb-3">Option B: The Safe / Familiar Path</h3>
+        <p class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Pros</p>
+        <ul class="text-xs text-slate-300 space-y-1 mb-3">
+          <li class="flex justify-between"><span>• Predictable routine</span><span class="text-emerald-400 font-mono">+4</span></li>
+          <li class="flex justify-between"><span>• Zero transition stress</span><span class="text-emerald-400 font-mono">+3</span></li>
+        </ul>
+        <p class="text-[11px] font-bold text-rose-400 uppercase tracking-wider mb-1 border-t border-slate-800/80 pt-2">Cons</p>
+        <ul class="text-xs text-slate-300 space-y-1">
+          <li class="flex justify-between"><span>• Risk of stagnation</span><span class="text-rose-400 font-mono">-5</span></li>
+          <li class="flex justify-between"><span>• High opportunity cost</span><span class="text-rose-400 font-mono">-3</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab 2: The Verdict -->
+    <div id="tab-verdict" class="hidden space-y-4">
+      <div class="bg-indigo-950/40 border border-indigo-500/30 p-4 rounded-xl">
+        <h4 class="text-sm font-bold text-indigo-400 mb-1">💡 The Rational Verdict</h4>
+        <p id="verdictText" class="text-sm text-slate-200">
+          Option A is favored if you can tolerate short-term friction for permanent upside.
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+          <h5 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">The Gut Check</h5>
+          <p class="text-xs text-slate-300 italic">"If a coin flip decided this for you right now, which outcome makes you feel secretly disappointed?"</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+          <h5 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">The 10/10/10 Rule</h5>
+          <p class="text-xs text-slate-300">In 10 minutes: nervous. In 10 months: adjusted. In 10 years: glad you took action.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    function generateAnalysis() {
+      const input = document.getElementById('decisionInput').value.trim();
+      const btn = document.getElementById('submitBtn');
+      const results = document.getElementById('resultsContainer');
+
+      if (!input) {
+        alert("Please enter a decision first!");
+        return;
       }
-    ]
-  },
-  "swot": {
-    "strengths": ["..."],
-    "weaknesses": ["..."],
-    "opportunities": ["..."],
-    "threats": ["..."]
-  },
-  "tiebreaker_verdict": {
-    "ai_recommendation": "Objective recommendation based on upside-to-downside ratio",
-    "ten_ten_ten": {
-      "ten_minutes": "...",
-      "ten_months": "...",
-      "ten_years": "..."
-    },
-    "gut_check_question": "A sharp question to reveal their subconscious preference"
-  }
-}
-</Html>
+
+      btn.innerText = "Analyzing...";
+      btn.disabled = true;
+
+      setTimeout(() => {
+        results.classList.remove('hidden');
+        btn.innerText = "✨ Break the Tie";
+        btn.disabled = false;
+        results.scrollIntoView({ behavior: 'smooth' });
+      }, 600);
+    }
+
+    function switchTab(activeTab) {
+      const tabs = ['pros_cons', 'verdict'];
+      tabs.forEach(tab => {
+        const content = document.getElementById('tab-' + tab);
+        const button = document.getElementById('tabBtn-' + tab);
+        
+        if (tab === activeTab) {
+          content.classList.remove('hidden');
+          button.className = "px-4 py-2 rounded-lg text-xs md:text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30";
+        } else {
+          content.classList.add('hidden');
+          button.className = "px-4 py-2 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-slate-200";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
